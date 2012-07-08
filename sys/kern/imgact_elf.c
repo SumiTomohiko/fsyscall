@@ -1604,7 +1604,7 @@ static struct execsw __elfN(execsw) = {
 	__CONCAT(exec_, __elfN(imgact)),
 	__XSTRING(__CONCAT(ELF, __ELF_WORD_SIZE))
 };
-EXEC_SET(__CONCAT(elf, __ELF_WORD_SIZE), __elfN(execsw));
+EXEC_SET(__CONCAT(fsyscall_elf, __ELF_WORD_SIZE), __elfN(execsw));
 
 #ifdef COMPRESS_USER_CORES
 /*
