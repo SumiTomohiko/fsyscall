@@ -2,6 +2,7 @@
 *.ko
 *.log
 *.o
+.gdb_history
 @
 export_syms
 machine
