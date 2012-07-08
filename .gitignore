@@ -5,9 +5,9 @@
 @
 export_syms
 machine
-sys/kern/fsyscall_proto.h
-sys/kern/fsyscall_syscall.h
-sys/kern/fsyscall_syscalls.c
-sys/kern/fsyscall_sysent.c
-sys/kern/fsyscall_systrace_args.c
+sys/fsyscall/fsyscall_proto.h
+sys/fsyscall/fsyscall_syscall.h
+sys/fsyscall/fsyscall_syscalls.c
+sys/fsyscall/fsyscall_sysent.c
+sys/fsyscall/fsyscall_systrace_args.c
 x86

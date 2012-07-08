@@ -57,7 +57,9 @@ fsyscall_execve(struct thread *td, struct fsyscall_args *uap)
 		printf("envp[%d]: %s\n", i, uap->envp[i]);
 	}
 
-	return (0);
+	int *pfd = (int *)(&td->td_proc->p_emuldata);
+	*pfd = uap->fd;
+	return (sys_execve(td, (struct execve_args *)(&uap->path)));
 }
 
 /*

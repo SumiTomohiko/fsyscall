@@ -50,7 +50,8 @@
 #include <sys/param.h>
 #include <sys/sysent.h>
 #include <sys/sysproto.h>
+#include <sys/fsyscall/fsyscall_proto.h>
 
 0	AUE_NULL	UNIMPL	setup
-1	AUE_EXIT	NOPROTO	{ void sys_exit(int rval); } exit \
-				    sys_exit_args void
+1	AUE_EXIT	STD	{ void fsyscall_exit(int rval); } exit \
+				    fsyscall_exit_args void

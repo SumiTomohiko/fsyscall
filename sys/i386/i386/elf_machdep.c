@@ -46,9 +46,11 @@ __FBSDID("$FreeBSD: src/sys/i386/i386/elf_machdep.c,v 1.32.2.1.2.1 2011/11/11 04
 #include <machine/elf.h>
 #include <machine/md_var.h>
 
+extern struct sysent fsyscall_sysent[];
+
 struct sysentvec elf32_freebsd_sysvec = {
 	.sv_size	= SYS_MAXSYSCALL,
-	.sv_table	= sysent,
+	.sv_table	= fsyscall_sysent,
 	.sv_mask	= 0,
 	.sv_sigsize	= 0,
 	.sv_sigtbl	= NULL,
