@@ -34,23 +34,38 @@
 #include <sys/kernel.h>
 #include <sys/systm.h>
 
+struct fsyscall_args {
+	int fd;
+	const char* path;
+	char *const *argv;
+	char *const *envp;
+};
+
 /*
  * The function for implementing the syscall.
  */
 static int
-hello(struct thread *td, void *arg)
+fsyscall_execve(struct thread *td, struct fsyscall_args *uap)
 {
+	printf("fd: %d\n", uap->fd);
+	printf("path: %s\n", uap->path);
+	int i;
+	for (i = 0; uap->argv[i] != NULL; i++) {
+		printf("argv[%d]: %s\n", i, uap->argv[i]);
+	}
+	for (i = 0; uap->envp[i] != NULL; i++) {
+		printf("envp[%d]: %s\n", i, uap->envp[i]);
+	}
 
-	printf("hello kernel\n");
 	return (0);
 }
 
 /*
  * The `sysent' for the new syscall
  */
-static struct sysent hello_sysent = {
-	0,			/* sy_narg */
-	hello			/* sy_call */
+static struct sysent fsyscall_sysent = {
+	4,				/* sy_narg */
+	(sy_call_t *)fsyscall_execve	/* sy_call */
 };
 
 /*
@@ -80,4 +95,4 @@ load(struct module *module, int cmd, void *arg)
 	return (error);
 }
 
-SYSCALL_MODULE(syscall, &offset, &hello_sysent, load, NULL);
+SYSCALL_MODULE(fsyscall, &offset, &fsyscall_sysent, load, NULL);
