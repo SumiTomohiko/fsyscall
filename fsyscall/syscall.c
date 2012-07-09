@@ -27,18 +27,27 @@
  */
 
 #include <sys/param.h>
-#include <sys/proc.h>
-#include <sys/module.h>
-#include <sys/sysproto.h>
-#include <sys/sysent.h>
 #include <sys/kernel.h>
+#include <sys/malloc.h>
+#include <sys/module.h>
+#include <sys/proc.h>
+#include <sys/sysent.h>
+#include <sys/sysproto.h>
 #include <sys/systm.h>
 
+MALLOC_DEFINE(M_FSYSCALL, "fsyscall", "fsyscall");
+
 struct fsyscall_args {
-	int fd;
+	int rfd;
+	int wfd;
 	const char* path;
 	char *const *argv;
 	char *const *envp;
+};
+
+struct fsyscall_data {
+	int rfd;
+	int wfd;
 };
 
 /*
@@ -47,7 +56,8 @@ struct fsyscall_args {
 static int
 fsyscall_execve(struct thread *td, struct fsyscall_args *uap)
 {
-	printf("fd: %d\n", uap->fd);
+	printf("rfd: %d\n", uap->rfd);
+	printf("wfd: %d\n", uap->wfd);
 	printf("path: %s\n", uap->path);
 	int i;
 	for (i = 0; uap->argv[i] != NULL; i++) {
@@ -57,8 +67,11 @@ fsyscall_execve(struct thread *td, struct fsyscall_args *uap)
 		printf("envp[%d]: %s\n", i, uap->envp[i]);
 	}
 
-	int *pfd = (int *)(&td->td_proc->p_emuldata);
-	*pfd = uap->fd;
+	struct malloc_type *type = M_FSYSCALL;
+	struct fsyscall_data *data = malloc(sizeof(*data), type, M_NOWAIT);
+	data->rfd = uap->rfd;
+	data->wfd = uap->wfd;
+	td->td_proc->p_emuldata = data;
 	return (sys_execve(td, (struct execve_args *)(&uap->path)));
 }
 
@@ -66,7 +79,7 @@ fsyscall_execve(struct thread *td, struct fsyscall_args *uap)
  * The `sysent' for the new syscall
  */
 static struct sysent fsyscall_sysent = {
-	4,				/* sy_narg */
+	5,				/* sy_narg */
 	(sy_call_t *)fsyscall_execve	/* sy_call */
 };
 
