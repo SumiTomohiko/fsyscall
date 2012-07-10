@@ -36,6 +36,8 @@
 #include <sys/sysproto.h>
 #include <sys/systm.h>
 
+#include <fsyscall/private.h>
+
 MALLOC_DEFINE(M_FSYSCALL, "fsyscall", "fsyscall");
 
 struct fsyscall_args {
@@ -44,11 +46,6 @@ struct fsyscall_args {
 	const char* path;
 	char *const *argv;
 	char *const *envp;
-};
-
-struct fsyscall_data {
-	int rfd;
-	int wfd;
 };
 
 /*
