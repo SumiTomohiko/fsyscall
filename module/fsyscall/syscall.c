@@ -36,7 +36,7 @@
 #include <sys/sysproto.h>
 #include <sys/systm.h>
 
-#include <fsyscall/private.h>
+#include <fsyscall/module.h>
 
 MALLOC_DEFINE(M_FSYSCALL, "fsyscall", "fsyscall");
 
