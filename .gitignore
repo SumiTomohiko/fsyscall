@@ -1,3 +1,4 @@
+*.core
 *.kld
 *.ko
 *.log
