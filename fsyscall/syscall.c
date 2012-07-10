@@ -27,6 +27,7 @@
  */
 
 #include <sys/param.h>
+#include <sys/eventhandler.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
 #include <sys/module.h>
@@ -88,20 +89,32 @@ static struct sysent fsyscall_sysent = {
  */
 static int offset = NO_SYSCALL;
 
+static eventhandler_tag fsyscall_exit_tag;
+
+extern struct sysentvec elf32_freebsd_sysvec;
+
+static void
+process_exit(void *_, struct proc *p)
+{
+	if (p->p_sysent != &elf32_freebsd_sysvec)
+		return;
+	free(p->p_emuldata, M_FSYSCALL);
+}
+
 /*
  * The function called at load/unload.
  */
 static int
-load(struct module *module, int cmd, void *arg)
+fsyscall_modevent(struct module *_, int cmd, void *__)
 {
 	int error = 0;
 
 	switch (cmd) {
 	case MOD_LOAD :
-		printf("syscall loaded at %d\n", offset);
+		fsyscall_exit_tag = EVENTHANDLER_REGISTER(process_exit, process_exit, NULL, EVENTHANDLER_PRI_ANY);
 		break;
 	case MOD_UNLOAD :
-		printf("syscall unloaded from %d\n", offset);
+		EVENTHANDLER_DEREGISTER(process_exit, fsyscall_exit_tag);
 		break;
 	default :
 		error = EOPNOTSUPP;
@@ -110,4 +123,4 @@ load(struct module *module, int cmd, void *arg)
 	return (error);
 }
 
-SYSCALL_MODULE(fsyscall, &offset, &fsyscall_sysent, load, NULL);
+SYSCALL_MODULE(fsyscall, &offset, &fsyscall_sysent, fsyscall_modevent, NULL);
