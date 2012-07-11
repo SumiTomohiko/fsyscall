@@ -12,6 +12,6 @@ module/sys/fsyscall/fsyscall_syscall.h
 module/sys/fsyscall/fsyscall_syscalls.c
 module/sys/fsyscall/fsyscall_sysent.c
 module/sys/fsyscall/fsyscall_systrace_args.c
-tests/exit/exit
-tests/slave/slave
+tools/exit/exit
+tools/slave/slave
 x86
