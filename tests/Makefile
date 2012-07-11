@@ -1,4 +1,4 @@
 
-SUBDIR = module tests
+SUBDIR = exit slave
 
 .include <bsd.subdir.mk>
