@@ -6,11 +6,12 @@ dir="$(dirname $0)"
 slave="${dir}/slave/slave"
 cmd="${dir}/${exe}/${exe}"
 "${slave}" "${cmd}" ${params}
-
-test_status $?
 status="$?"
-if [ "${status}" -ne 127 ]; then
-  if [ "${status}" -eq 0 ]; then
+
+type test_status > /dev/null
+if [ "$?" -eq 0 ]; then
+  test_status "${status}"
+  if [ "$?" -eq 0 ]; then
     okng="OK"
   else
     okng="NG"
