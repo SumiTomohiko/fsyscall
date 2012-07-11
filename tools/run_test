@@ -8,8 +8,9 @@ cmd="${dir}/${exe}/${exe}"
 "${slave}" "${cmd}" ${params}
 
 test_status $?
-if [ "$?" -ne 127 ]; then
-  if [ "$?" = 0 ]; then
+status="$?"
+if [ "${status}" -ne 127 ]; then
+  if [ "${status}" -eq 0 ]; then
     okng="OK"
   else
     okng="NG"
