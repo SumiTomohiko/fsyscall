@@ -1,4 +1,4 @@
 
 PROG = exit
 
-.include "../test.mk"
+.include "../tools.mk"
