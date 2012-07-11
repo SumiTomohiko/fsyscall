@@ -2,7 +2,9 @@
 section .text
 global _start
 _start:
-	push dword 0
+	mov ecx, [esp]
+	sub ecx, 1
+	push ecx
 	mov eax, 1
 	push eax
 	int 80h
