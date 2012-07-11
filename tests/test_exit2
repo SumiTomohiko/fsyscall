@@ -1,0 +1,10 @@
+
+exe="exit"
+params=$(jot 42)
+
+test_status()
+{
+  test "$1" -eq 42
+}
+
+# vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2

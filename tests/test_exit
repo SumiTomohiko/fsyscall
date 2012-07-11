@@ -1,0 +1,9 @@
+
+exe="exit"
+
+test_status()
+{
+  test "$1" -eq 0
+}
+
+# vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2

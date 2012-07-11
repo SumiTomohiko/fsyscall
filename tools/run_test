@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. "${1}"
+
+dir="$(dirname $0)"
+slave="${dir}/slave/slave"
+cmd="${dir}/${exe}/${exe}"
+"${slave}" "${cmd}" ${params}
+
+test_status $?
+if [ "$?" -ne 127 ]; then
+  if [ "$?" = 0 ]; then
+    okng="OK"
+  else
+    okng="NG"
+  fi
+  echo "${1}: ${okng}"
+fi
+
+# vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2
