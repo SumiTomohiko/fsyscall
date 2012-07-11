@@ -48,7 +48,7 @@ find_syscall()
 {
 	int modid = modfind("sys/fsyscall");
 	if (modid == -1) {
-		err(-1, "modified");
+		err(-1, "modfind");
 	}
 	struct module_stat stat;
 	stat.version = sizeof(stat);
