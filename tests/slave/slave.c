@@ -59,14 +59,27 @@ find_syscall()
 }
 
 static int
+read_int(int fd, int *p)
+{
+	int n = 0;
+	char m = 0x80;
+	int nbytes = sizeof(m);
+	while (((m & 0x80) != 0) && (read(fd, &m, nbytes) == nbytes)) {
+		n = (n << 7) + (m & 0x7f);
+	}
+	if ((m & 0x80) != 0)
+		return (-1);
+	*p = n;
+	return (0);
+}
+
+static int
 read_syscall(int fd)
 {
-	int cmd;
-	int nbytes = read(fd, &cmd, sizeof(cmd));
-	printf("%s:%u nbytes=%d\n", __FILE__, __LINE__, nbytes);
-	if (nbytes != sizeof(cmd))
-		err(1, "read");
-	return cmd;
+	int n;
+	if (read_int(fd, &n) != 0)
+		err(1, "read_syscall");
+	return n;
 }
 
 #define	array_sizeof(x)	(sizeof(x) / sizeof(x[0]))
@@ -85,10 +98,8 @@ print_error(const char* fmt, ...)
 static void
 process_exit(int fd, int *status)
 {
-	int nbytes = sizeof(*status);
-	if (read(fd, status, nbytes) != nbytes)
-		err(1, "%s:%u read", __FILE__, __LINE__);
-	printf("%s:%u status=%d\n", __FILE__, __LINE__, *status);
+	if (read_int(fd, status) != 0)
+		err(1, "read_int");
 }
 
 static bool

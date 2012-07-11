@@ -1,5 +1,6 @@
 
 #include <sys/cdefs.h>
+#include <sys/limits.h>
 #include <sys/param.h>
 #include <sys/proc.h>
 #include <sys/syscallsubr.h>
@@ -7,7 +8,9 @@
 #include <sys/systm.h>
 #include <sys/uio.h>
 
+#include <fsyscall/encode.h>
 #include <fsyscall/module.h>
+#include <fsyscall/syscall.h>
 #include <sys/fsyscall/fsyscall_proto.h>
 
 static int do_write(struct thread *, struct write_args *);
@@ -21,10 +24,8 @@ do_write(td, uap)
 	struct iovec aiov;
 	int error;
 
-#if 0
-	if (uap->nbyte > INT_MAX)
+	if (INT_MAX < uap->nbyte)
 		return (EINVAL);
-#endif
 	aiov.iov_base = (void *)(uintptr_t)uap->buf;
 	aiov.iov_len = uap->nbyte;
 	auio.uio_iov = &aiov;
@@ -35,22 +36,36 @@ do_write(td, uap)
 	return(error);
 }
 
+static int
+write_int(struct thread *td, int fd, int n)
+{
+	char buf[BUFSIZE_UINT];
+	int nbyte = encode_uint(n, buf, BUFSIZE_UINT);
+	if (nbyte < 1)
+		return (-1);
+	struct write_args args;
+	args.fd = fd;
+	args.buf = buf;
+	args.nbyte = nbyte;
+	return (do_write(td, &args));
+}
+
+static int
+write_syscall(struct thread *td, int fd)
+{
+	return write_int(td, fd, SYSCALL_EXIT);
+}
+
 void
 sys_fsyscall_exit(struct thread *td, struct fsyscall_exit_args *uap)
 {
 	void *p_emuldata = td->td_proc->p_emuldata;
 	struct fsyscall_data *data = (struct fsyscall_data *)p_emuldata;
-	int cmd = 0;
-	struct write_args args;
-	args.fd = data->wfd;
-	args.buf = &cmd;
-	args.nbyte = sizeof(cmd);
-	printf("%s:%u args.fd=%d\n", __FILE__, __LINE__, data->wfd);
-	int error = do_write(td, &args);
-	printf("%s:%u error=%d\n", __FILE__, __LINE__, error);
-	args.buf = &uap->rval;
-	error = do_write(td, &args);
-	printf("%s:%u error=%d\n", __FILE__, __LINE__, error);
+	int wfd = data->wfd;
+	if (write_syscall(td, wfd) != 0)
+		return;
+	if (write_int(td, wfd, uap->rval) != 0)
+		return;
 	exit1(td, uap->rval);
 	/* NOTREACHED */
 }
