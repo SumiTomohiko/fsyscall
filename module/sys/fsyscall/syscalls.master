@@ -55,3 +55,11 @@
 0	AUE_NULL	UNIMPL	setup
 1	AUE_EXIT	STD	{ void fsyscall_exit(int rval); } exit \
 				    fsyscall_exit_args void
+2	AUE_NULL	UNIMPL	fork
+3	AUE_NULL	UNIMPL	read
+4	AUE_NULL	UNIMPL	write
+5	AUE_NULL	UNIMPL	open
+6	AUE_NULL	UNIMPL	close
+7	AUE_NULL	UNIMPL	wait4
+8	AUE_CREAT	STD	{ int fsyscall_creat(char *path, mode_t mode); }
+9	AUE_LINK	STD	{ int fsyscall_link(char *path, char *link); }

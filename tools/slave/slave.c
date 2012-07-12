@@ -33,6 +33,7 @@
 #include <sys/wait.h>
 
 #include <err.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -102,14 +103,64 @@ process_exit(int fd, int *status)
 		err(1, "read_int");
 }
 
+static char *
+read_str(int fd)
+{
+	int len;
+	if (read_int(fd, &len) != 0)
+		err(1, "read_int");
+	char *s = (char *)malloc(len + 1);
+	if (s == NULL)
+		err(1, "malloc");
+	int pos;
+	for (pos = 0; pos < len; pos += read(fd, &s[pos], len - pos));
+	s[pos] = '\0';
+	return s;
+}
+
+static void
+process_link(int fd)
+{
+	char *src = read_str(fd);
+	if (src == NULL)
+		err(1, "read_str");
+	char *dest = read_str(fd);
+	if (dest == NULL)
+		err(1, "read_str");
+	if (link(src, dest) != 0)
+		err(1, "link");
+	free(dest);
+	free(src);
+}
+
+static void
+process_creat(int fd)
+{
+	char *path = read_str(fd);
+	if (path == NULL)
+		err(1, "read_str");
+	int mode;
+	if (read_int(fd, &mode) != 0)
+		err(1, "read_int");
+	if (creat(path, mode) < 0)
+		err(1, "creat");
+	free(path);
+}
+
 static bool
 slave_main(int rfd, int *pstatus)
 {
 	int syscall_num = read_syscall(rfd);
 	switch (syscall_num) {
+	case SYSCALL_CREAT:
+		process_creat(rfd);
+		break;
 	case SYSCALL_EXIT:
 		process_exit(rfd, pstatus);
 		return (false);
+	case SYSCALL_LINK:
+		process_link(rfd);
+		break;
 	default:
 		print_error("Unknown syscall: %d", syscall_num);
 		exit(1);

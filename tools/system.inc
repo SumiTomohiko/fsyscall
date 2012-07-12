@@ -13,4 +13,12 @@ access.the.bsd.kernel:
 	system 1
 %endmacro
 
+%macro sys.creat 0
+	system 8
+%endmacro
+
+%macro sys.link 0
+	system 9
+%endmacro
+
 # vim: filetype=asm

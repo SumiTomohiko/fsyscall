@@ -2,5 +2,7 @@
 #define FSYSCALL_SYSCALL_H_INCLUDED
 
 #define	SYSCALL_EXIT	0
+#define	SYSCALL_CREAT	8
+#define	SYSCALL_LINK	9
 
 #endif
